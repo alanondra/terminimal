@@ -13,6 +13,7 @@ final class Console
 	private static $stderr;
 	private static $prefix = null;
 	private static $isWin = null;
+	private static $nullDevice;
 
 	/**
 	 * Initialize stream handles to input and output buffers.
@@ -31,44 +32,61 @@ final class Console
 
 		static::$isWin = (strtolower(substr(PHP_OS, 0, 3)) === 'win');
 
+		static::$nullDevice = ((static::$isWin) ? 'NUL' : '/dev/null');
+
 		static::$init = true;
 	}
 
-	public static function getDimensions()
+	/**
+	 * Returns the width of the screen in characters.
+	 *
+	 * @return int
+	 */
+	public static function getColumns()
 	{
-		$dim = new \stdClass();
-		$dim->x = -1;
-		$dim->y = -1;
+		static::init();
 
-		if (!static::$isWin) {
-			$dim->x = intval(exec('tput cols'));
-			$dim->y = intval(exec('tput lines'));
-		} else {
-			$stat = explode("\n", trim(exec('mode con/status')));
+		$cols = shell_exec(sprintf('tput cols 2> %s', static::$nullDevice));
 
-			foreach ($stat as $line) {
-				$ln = preg_replace('/\s+/', ' ', trim($line));
-
-				$cols = array_pad(explode(':', $ln, 2), 2, null);
-
-				$key = trim(strtolower($cols[0]));
-				$val = intval(trim($cols[1]));
-
-				if ($key == 'columns') {
-					$dim->x = $val;
-					if ($dim->y >= 0) {
-						break;
-					}
-				} elseif ($key == 'lines') {
-					$dim->y = $val;
-					if ($dim->x >= 0) {
-						break;
-					}
-				}
-			}
+		if (!is_null($cols)) {
+			return intval($cols);
 		}
 
-		return $dim;
+		$con = shell_exec(sprintf('mode con/status'));
+
+		if (!is_null($con)) {
+			$lines = explode("\n", trim($con));
+			list($label, $value) = array_map('trim', explode(':', $lines[3], 2));
+			return intval($value);
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Returns the height of the screen or output buffer in characters.
+	 *
+	 * @return int
+	 */
+	public static function getRows()
+	{
+		static::init();
+
+		$cols = shell_exec(sprintf('tput lines 2> %s', static::$nullDevice));
+
+		if (!is_null($cols)) {
+			return intval($cols);
+		}
+
+		$con = shell_exec(sprintf('mode con/status'));
+
+		if (!is_null($con)) {
+			$lines = explode("\n", trim($con));
+			list($label, $value) = array_map('trim', explode(':', $lines[2], 2));
+			return intval($value);
+		}
+
+		return 0;
 	}
 
 	/**
@@ -127,17 +145,5 @@ final class Console
 		}
 
 		return fgets(static::$stdin);
-	}
-
-	/**
-	 * Clear the screen.
-	 */
-	public static function clear()
-	{
-		static::init();
-
-		$cmd = ((static::$isWin) ? 'cls' : 'clear');
-
-		system($cmd);
 	}
 }
