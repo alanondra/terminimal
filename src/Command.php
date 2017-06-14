@@ -2,13 +2,13 @@
 
 namespace Terminimal;
 
-use Terminimal\Support\ArgumentBag;
+use Terminimal\Containers\ArgumentContainer;
 
 abstract class Command
 {
 	protected $arguments;
 
-	public function __construct(ArgumentBag $arguments)
+	public function __construct(ArgumentContainer $arguments)
 	{
 		$this->arguments = $arguments;
 	}

@@ -3,7 +3,7 @@
 namespace Terminimal;
 
 use Exception;
-use Terminimal\Support\ArgumentBag;
+use Terminimal\Containers\ArgumentContainer;
 
 class Application
 {
@@ -19,7 +19,7 @@ class Application
 	 */
 	public function __construct($argv)
 	{
-		$this->arguments = ArgumentBag::parse($argv);
+		$this->arguments = ArgumentContainer::parse($argv);
 		$this->commands = [];
 	}
 

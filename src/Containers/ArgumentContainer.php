@@ -1,8 +1,8 @@
 <?php
 
-namespace Terminimal\Support;
+namespace Terminimal\Containers;
 
-class ArgumentBag
+class ArgumentContainer
 {
 	/**
 	 * Parse the command line in a less restrictive manner than is possible via getopt.
@@ -73,7 +73,7 @@ class ArgumentBag
 	private $parameters;
 
 	/**
-	 * Create a new instance of ArgumentBag.
+	 * Create a new instance of ArgumentContainer.
 	 *
 	 * @return void
 	 */
