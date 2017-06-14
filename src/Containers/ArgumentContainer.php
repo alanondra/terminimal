@@ -18,6 +18,10 @@ class ArgumentContainer
 		$arguments->script = array_shift($argv);
 		$arguments->command = array_shift($argv);
 
+		if (!is_null($arguments->command)) {
+			$arguments->command = strtolower(trim($arguments->command));
+		}
+
 		$regex = array(
 			'short' => '/^-([a-z])$/i',
 			'flags' => '/^-([a-z\?]+)$/i',

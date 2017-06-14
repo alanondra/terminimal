@@ -3,12 +3,14 @@
 namespace Terminimal;
 
 use Exception;
+use Terminimal\Commands\DefaultCommand;
 use Terminimal\Containers\ArgumentContainer;
 
 class Application
 {
 	protected $arguments;
 	protected $commands;
+	protected $running;
 
 	/**
 	 * Create a new instance of Application.
@@ -21,6 +23,9 @@ class Application
 	{
 		$this->arguments = ArgumentContainer::parse($argv);
 		$this->commands = [];
+		$this->running = false;
+
+		$this->registerCommand('_default', DefaultCommand::class);
 	}
 
 	/**
@@ -76,32 +81,39 @@ class Application
 	}
 
 	/**
+	 * Get a list of available command routes.
+	 *
+	 * @return array
+	 */
+	public function getRoutes()
+	{
+		return array_values(array_filter(array_keys($this->commands), function($command) { return $command != '_default'; }));
+	}
+
+	/**
 	 * Run the application.
 	 *
 	 * @return void
 	 */
 	public function run()
 	{
-		$command = strtolower(trim($this->arguments->getCommand()));
-
-		$valid = $this->validateCommand($command);
-
-		if (!$valid) {
-			$this->listCommands();
-			exit(1);
+		if ($this->running) {
+			return;
 		}
 
-		$class = $this->commands[$command];
+		$this->running = true;
 
-		$cmd = new $class($this->arguments);
+		$route = $this->arguments->getCommand();
+
+		$class = $this->findCommand($route);
 
 		try {
-			$this->renderManual($cmd);
+			$cmd = new $class($this, $this->arguments);
 
-			$run = $cmd->run();
-
-			if ($run === false) {
-				exit(1);
+			if ($cmd->shouldShowManual()) {
+				Console::writeLine($cmd->getManual());
+			} else {
+				$cmd->run();
 			}
 		} catch (Exception $exc) {
 			Console::writeLine($exc->getMessage(), Console::ERR);
@@ -112,58 +124,12 @@ class Application
 	/**
 	 * Validate that the text command given is registered.
 	 *
-	 * @param  string  $command
+	 * @param  string  $route
 	 *
 	 * @return boolean
 	 */
-	protected function validateCommand($command)
+	protected function findCommand($route)
 	{
-		if (empty($command)) {
-			Console::writeLine('Command not specified.' . PHP_EOL, Console::ERR);
-			return false;
-		}
-
-		if (!key_exists($command, $this->commands)) {
-			Console::writeLine('Invalid command specified.', Console::ERR);
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * List all available commands.
-	 *
-	 * @return $this
-	 */
-	protected function listCommands()
-	{
-		if (!empty($this->commands)) {
-			Console::writeLine('Available commands (use -? for more info):');
-
-			foreach (array_keys($this->commands) as $name) {
-				Console::writeLine(sprintf(' - %s', $name));
-			}
-		} else {
-			Console::writeLine('No commands are registered.');
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Render the Command's manual and exit if the parameter was given.
-	 *
-	 * @param Command $command
-	 *
-	 * @return void
-	 */
-	protected function renderManual(Command $command)
-	{
-		if ($this->arguments->hasFlag('?') || $this->arguments->hasFlag('h') || $this->arguments->getOption('help')) {
-			$man = $command->getManual();
-			Console::writeLine($man);
-			exit;
-		}
+		return $this->commands[(key_exists($route, $this->commands) ? $route : '_default')];
 	}
 }

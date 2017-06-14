@@ -2,19 +2,45 @@
 
 namespace Terminimal;
 
+use Terminimal\Console;
+use Terminimal\Application;
 use Terminimal\Containers\ArgumentContainer;
 
 abstract class Command
 {
+	/**
+	 * @var Terminimal\Application
+	 */
+	protected $app;
+	/**
+	 * @var Terminimal\Containers\ArgumentContainer
+	 */
 	protected $arguments;
 
-	public function __construct(ArgumentContainer $arguments)
+	/**
+	 * Create a new instance of Command.
+	 *
+	 * @param  Application  $app
+	 * @param  ArgumentContainer  $arguments
+	 */
+	public function __construct(Application $app, ArgumentContainer $arguments)
 	{
+		$this->app = $app;
 		$this->arguments = $arguments;
 	}
 
 	/**
-	 * Manual text when given either -? -h or --help options.
+	 * Condition to check if the Command should display its manual instead of executing.
+	 *
+	 * @return boolean
+	 */
+	public function shouldShowManual()
+	{
+		return ($this->arguments->hasFlag('?') || $this->arguments->hasFlag('h') || $this->arguments->getOption('help'));
+	}
+
+	/**
+	 * Manual text to display if shouldShowManual returns true.
 	 *
 	 * @return string
 	 */
