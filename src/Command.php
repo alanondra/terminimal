@@ -39,7 +39,7 @@ abstract class Command
 	}
 
 	/**
-	 * Manual text to display if shouldShowManual returns true.
+	 * Manual text to display if showsManual returns true.
 	 *
 	 * @return string
 	 */
