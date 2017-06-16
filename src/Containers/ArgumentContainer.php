@@ -85,9 +85,9 @@ class ArgumentContainer
 	{
 		$this->script = null;
 		$this->command = null;
-		$this->flags = array();
-		$this->options = array();
-		$this->parameters = array();
+		$this->flags = [];
+		$this->options = [];
+		$this->parameters = [];
 	}
 
 	/**

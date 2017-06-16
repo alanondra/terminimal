@@ -3,12 +3,19 @@
 namespace Terminimal;
 
 use Exception;
+use League\CLImate\CLImate;
 use Terminimal\Commands\DefaultCommand;
 use Terminimal\Containers\ArgumentContainer;
 
+/**
+ * Terminimal Application
+ *
+ * @property-read League\CLImate\CLImate $console
+ */
 class Application
 {
 	protected $arguments;
+	protected $console;
 	protected $commands;
 	protected $running;
 
@@ -22,10 +29,27 @@ class Application
 	public function __construct($argv)
 	{
 		$this->arguments = ArgumentContainer::parse($argv);
+		$this->console = new CLImate();
 		$this->commands = [];
 		$this->running = false;
-
 		$this->registerCommand('_default', DefaultCommand::class);
+	}
+
+	/**
+	 * Access non-public properties.
+	 *
+	 * @param string $property
+	 *
+	 * @return mixed
+	 */
+	public function __get($property)
+	{
+		switch ($property) {
+			case 'console':
+				return $this->$property;
+		}
+
+		return null;
 	}
 
 	/**
@@ -87,7 +111,9 @@ class Application
 	 */
 	public function getRoutes()
 	{
-		return array_values(array_filter(array_keys($this->commands), function($command) { return $command != '_default'; }));
+		return array_values(array_filter(array_keys($this->commands), function ($command) {
+			return $command != '_default';
+		}));
 	}
 
 	/**
@@ -110,14 +136,15 @@ class Application
 		try {
 			$cmd = new $class($this, $this->arguments);
 
-			if ($cmd->shouldShowManual()) {
-				Console::writeLine($cmd->getManual());
+			if ($cmd->showsManual()) {
+				$this->console->out($cmd->getManual());
 			} else {
 				$cmd->run();
+				return true;
 			}
 		} catch (Exception $exc) {
-			Console::writeLine($exc->getMessage(), Console::ERR);
-			exit(1);
+			$this->console->out($exc->getMessage());
+			return false;
 		}
 	}
 

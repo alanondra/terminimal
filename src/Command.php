@@ -2,7 +2,6 @@
 
 namespace Terminimal;
 
-use Terminimal\Console;
 use Terminimal\Application;
 use Terminimal\Containers\ArgumentContainer;
 
@@ -34,7 +33,7 @@ abstract class Command
 	 *
 	 * @return boolean
 	 */
-	public function shouldShowManual()
+	public function showsManual()
 	{
 		return ($this->arguments->hasFlag('?') || $this->arguments->hasFlag('h') || $this->arguments->getOption('help'));
 	}
