@@ -78,8 +78,6 @@ class ArgumentBag
 
 	/**
 	 * Create a new instance of ArgumentBag.
-	 *
-	 * @return void
 	 */
 	public function __construct()
 	{

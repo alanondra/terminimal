@@ -3,7 +3,7 @@
 
 ### Requirements
 
-* PHP 5.6, or PHP 7.0/7.1
+* PHP 5.6+ or 7.0+
 * Composer
 
 ### Installation
@@ -21,6 +21,11 @@
 
 		composer require alanondra/terminimal
 		composer install
+
+### Features
+
+Out of the box, Terminimal uses dependency injection based on [Container](http://container.thephpleague.com/2.x/)
+and console output using [CLImate](http://climate.thephpleague.com/).
 
 ### Documentation
 
