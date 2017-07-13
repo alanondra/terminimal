@@ -3,7 +3,7 @@
 namespace Terminimal;
 
 use Terminimal\Application;
-use Terminimal\Containers\ArgumentContainer;
+use Terminimal\Bags\ArgumentBag;
 
 abstract class Command
 {
@@ -12,7 +12,7 @@ abstract class Command
 	 */
 	protected $app;
 	/**
-	 * @var Terminimal\Containers\ArgumentContainer
+	 * @var Terminimal\Bags\ArgumentBag
 	 */
 	protected $arguments;
 
@@ -20,9 +20,9 @@ abstract class Command
 	 * Create a new instance of Command.
 	 *
 	 * @param  Application  $app
-	 * @param  ArgumentContainer  $arguments
+	 * @param  ArgumentBag  $arguments
 	 */
-	public function __construct(Application $app, ArgumentContainer $arguments)
+	public function __construct(Application $app, ArgumentBag $arguments)
 	{
 		$this->app = $app;
 		$this->arguments = $arguments;
@@ -33,13 +33,13 @@ abstract class Command
 	 *
 	 * @return boolean
 	 */
-	public function showsManual()
+	public function shouldShowManual()
 	{
 		return ($this->arguments->hasFlag('?') || $this->arguments->hasFlag('h') || $this->arguments->getOption('help'));
 	}
 
 	/**
-	 * Manual text to display if showsManual returns true.
+	 * Manual text to display if shouldShowManual returns true.
 	 *
 	 * @return string
 	 */

@@ -1,8 +1,8 @@
 <?php
 
-namespace Terminimal\Containers;
+namespace Terminimal\Bags;
 
-class ArgumentContainer
+class ArgumentBag
 {
 	/**
 	 * Parse the command line in a less restrictive manner than is possible via getopt.
@@ -77,7 +77,7 @@ class ArgumentContainer
 	private $parameters;
 
 	/**
-	 * Create a new instance of ArgumentContainer.
+	 * Create a new instance of ArgumentBag.
 	 *
 	 * @return void
 	 */
@@ -85,9 +85,9 @@ class ArgumentContainer
 	{
 		$this->script = null;
 		$this->command = null;
-		$this->flags = [];
-		$this->options = [];
-		$this->parameters = [];
+		$this->flags = array();
+		$this->options = array();
+		$this->parameters = array();
 	}
 
 	/**

@@ -3,6 +3,7 @@
 namespace Terminimal\Commands;
 
 use Terminimal\Command;
+use Terminimal\Application;
 
 class DefaultCommand extends Command
 {
@@ -11,7 +12,7 @@ class DefaultCommand extends Command
 	 *
 	 * @return boolean
 	 */
-	public function showsManual()
+	public function shouldShowManual()
 	{
 		return false;
 	}
@@ -21,16 +22,20 @@ class DefaultCommand extends Command
 	 */
 	public function run()
 	{
-		$commands = $this->app->getRoutes();
+		$console = $this->app->console;
+
+		$commands = array_values(array_filter($this->app->commands->all(), function ($command) {
+			return $command != Application::DEFAULT_HANDLE;
+		}));
 
 		if (!empty($commands)) {
-			$this->app->console->out('Available commands:');
+			$console->out('Available commands:');
 
 			foreach ($commands as $name) {
-				$this->app->console->out(sprintf(' - %s', $name));
+				$console->out(sprintf(' - %s', $name));
 			}
 		} else {
-			$this->app->console->out('No commands are registered.');
+			$console->out('No commands are registered.');
 		}
 	}
 }
