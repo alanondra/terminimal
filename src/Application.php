@@ -4,10 +4,8 @@ namespace Terminimal;
 
 use Exception;
 
-use League\Container\Container;
 use League\CLImate\CLImate;
 
-use Terminimal\Providers\AppProvider;
 use Terminimal\Bags\CommandBag;
 use Terminimal\Bags\ArgumentBag;
 use Terminimal\Commands\DefaultCommand;
@@ -30,8 +28,6 @@ class Application
 		'commands',
 		'console',
 	];
-
-	protected $container;
 
 	/**
 	 * @var boolean
