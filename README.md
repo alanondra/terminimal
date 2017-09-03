@@ -24,8 +24,7 @@
 
 ### Features
 
-Out of the box, Terminimal uses dependency injection based on [Container](http://container.thephpleague.com/2.x/)
-and console output using [CLImate](http://climate.thephpleague.com/).
+Out of the box, Terminimal uses console output using [CLImate](http://climate.thephpleague.com/).
 
 ### Documentation
 

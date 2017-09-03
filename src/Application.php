@@ -5,9 +5,9 @@ namespace Terminimal;
 use Exception;
 
 use League\Container\Container;
-use League\Container\ReflectionContainer;
 use League\CLImate\CLImate;
 
+use Terminimal\Providers\AppProvider;
 use Terminimal\Bags\CommandBag;
 use Terminimal\Bags\ArgumentBag;
 use Terminimal\Commands\DefaultCommand;
@@ -17,7 +17,7 @@ use Terminimal\Commands\DefaultCommand;
  * @property-read Terminimal\Bags\CommandBag $commands
  * @property-read League\CLImate\CLImate $console
  */
-class Application extends Container
+class Application
 {
 	const DEFAULT_HANDLE = '_default';
 
@@ -26,11 +26,16 @@ class Application extends Container
 	 * document those extensions as part of the class documentation
 	 */
 	protected static $aliases = [
-		'arguments' => ArgumentBag::class,
-		'commands' => CommandBag::class,
-		'console' => CLImate::class,
+		'arguments',
+		'commands',
+		'console',
 	];
 
+	protected $container;
+
+	/**
+	 * @var boolean
+	 */
 	protected $running;
 
 	/**
@@ -42,18 +47,14 @@ class Application extends Container
 	 */
 	public function __construct($argv)
 	{
-		parent::__construct();
-
 		$this->running = false;
 
-		$this->delegate(new ReflectionContainer());
+		$this->arguments = ArgumentBag::parse($argv);
 
-		$this->share(static::class, $this);
-		$this->share(ArgumentBag::class, ArgumentBag::parse($argv));
-		$this->share(CommandBag::class, new CommandBag());
-		$this->share(CLImate::class, new CLImate());
-
+		$this->commands = new CommandBag();
 		$this->commands->set(static::DEFAULT_HANDLE, DefaultCommand::class);
+
+		$this->console = new CLImate();
 	}
 
 	/**
@@ -65,8 +66,8 @@ class Application extends Container
 	 */
 	public function __get($property)
 	{
-		if (key_exists($property, static::$aliases)) {
-			return $this->get(static::$aliases[$property]);
+		if (in_array($property, static::$aliases)) {
+			return $this->$property;
 		}
 
 		return null;
@@ -98,7 +99,7 @@ class Application extends Container
 				throw new Exception('No commands are registered (including default).');
 			}
 
-			$cmd = $this->get($class);
+			$cmd = new $class($this, $this->arguments);
 
 			if ($cmd->shouldShowManual()) {
 				$console->out($cmd->getManual());
