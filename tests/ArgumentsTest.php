@@ -2,7 +2,7 @@
 
 namespace TerminimalTests;
 
-use Terminimal\Containers\ArgumentContainer;
+use Terminimal\Bags\ArgumentBag;
 
 class ArgumentsTest extends Test
 {
@@ -10,7 +10,7 @@ class ArgumentsTest extends Test
 	{
 		$cl = static::fakeCommandLine('test -a -bc -d baz --foo=bar');
 
-		$args = ArgumentContainer::parse($cl);
+		$args = ArgumentBag::parse($cl);
 
 		$this->assertEquals('test.php', $args->getScript());
 		$this->assertEquals('test', $args->getCommand());

@@ -2,7 +2,12 @@
 
 namespace TerminimalTests;
 
+use League\CLImate\CLImate;
+
 use Terminimal\Application;
+use Terminimal\Bags\ArgumentBag;
+use Terminimal\Bags\CommandBag;
+
 use TerminimalTests\Commands\HelloWorldCommand;
 
 class ApplicationTest extends Test
@@ -16,12 +21,10 @@ class ApplicationTest extends Test
 
 		$app = new Application($cl);
 
-		$app->console->output->defaultTo('buffer');
-
-		$result = $app->run();
-
-		$this->assertEquals(true, $result);
-		$this->assertEquals('No commands are registered.' . PHP_EOL, $app->console->output->get('buffer')->get());
+		$this->assertInstanceOf(Application::class, $app);
+		$this->assertInstanceOf(ArgumentBag::class, $app->arguments);
+		$this->assertInstanceOf(CommandBag::class, $app->commands);
+		$this->assertInstanceOf(CLImate::class, $app->console);
 	}
 
 	/**
@@ -37,11 +40,10 @@ class ApplicationTest extends Test
 
 		$app->console->output->defaultTo('buffer');
 
-		$app->registerCommand($command, HelloWorldCommand::class);
+		$app->commands->set($command, HelloWorldCommand::class);
 
-		$result = $app->run();
+		$app->run();
 
-		$this->assertEquals(true, $result);
 		$this->assertEquals('Hello, world!' . PHP_EOL, $app->console->output->get('buffer')->get());
 	}
 
@@ -60,11 +62,10 @@ class ApplicationTest extends Test
 
 		$app->console->output->defaultTo('buffer');
 
-		$app->registerCommand($command, HelloWorldCommand::class);
+		$app->commands->set($command, HelloWorldCommand::class);
 
-		$result = $app->run();
+		$app->run();
 
-		$this->assertEquals(false, $result);
 		$this->assertEquals('Help text.' . PHP_EOL, $app->console->output->get('buffer')->get());
 	}
 }
