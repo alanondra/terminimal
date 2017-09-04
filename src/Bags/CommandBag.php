@@ -82,7 +82,7 @@ class CommandBag
 
 	/**
 	 * Get the full class name of the Command based on a given handle.
-	 * 
+	 *
 	 * @param string $handle
 	 *
 	 * @return string|null
