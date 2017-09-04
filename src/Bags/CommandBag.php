@@ -3,7 +3,11 @@
 namespace Terminimal\Bags;
 
 use Exception;
+use InvalidArgumentException;
+
 use Terminimal\Command;
+use Terminimal\Exceptions\MissingClassException;
+use Terminimal\Exceptions\InvalidHeredityException;
 
 class CommandBag
 {
@@ -40,21 +44,21 @@ class CommandBag
 	public function set($handle, $command)
 	{
 		if (!is_string($handle)) {
-			$type = ( is_object($handle) ? get_class($handle) : gettype($handle) );
-			throw new Exception(sprintf('%s requires a command name string; %s given.', __METHOD__, $type));
+			$type = (is_object($handle) ? get_class($handle) : gettype($handle));
+			throw new InvalidArgumentException(sprintf('%s requires a command name string; %s given.', __METHOD__, $type));
 		}
 
 		if (!is_string($command)) {
-			$type = ( is_object($command) ? get_class($command) : gettype($command) );
-			throw new Exception(sprintf('%s requires a class path string; %s given.', __METHOD__, $type));
+			$type = (is_object($command) ? get_class($command) : gettype($command));
+			throw new InvalidArgumentException(sprintf('%s requires a class path string; %s given.', __METHOD__, $type));
 		}
 
 		if (!class_exists($command)) {
-			throw new Exception(sprintf('Class "%s" does not exist.', $command));
+			throw new MissingClassException($command);
 		}
 
 		if (!is_subclass_of($command, Command::class)) {
-			throw new Exception(sprintf('Class "%s" must be a child of "%s".', $command, Command::class));
+			throw new InvalidHeredityException(Command::class, $command);
 		}
 
 		$_handle = $this->formatHandle($handle);
@@ -141,7 +145,7 @@ class CommandBag
 	{
 		if (!is_null($handle) && !is_string($handle)) {
 			$type = ( is_object($handle) ? get_class($handle) : gettype($handle) );
-			throw new Exception(sprintf('Command handle must be a string; %s given.', $type));
+			throw new InvalidArgumentException(sprintf('Command handle must be a string; %s given.', $type));
 		}
 
 		return strtolower(trim($handle));

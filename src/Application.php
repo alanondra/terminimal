@@ -3,6 +3,7 @@
 namespace Terminimal;
 
 use Exception;
+use LogicException;
 
 use League\CLImate\CLImate;
 
@@ -19,11 +20,10 @@ class Application
 {
 	const DEFAULT_HANDLE = '_default';
 
-	/*
-	 * static list to encourage extensions to the Application class to
-	 * document those extensions as part of the class documentation
+	/**
+	 * @var array
 	 */
-	protected static $aliases = [
+	protected static $accessors = [
 		'arguments',
 		'commands',
 		'console',
@@ -62,7 +62,7 @@ class Application
 	 */
 	public function __get($property)
 	{
-		if (in_array($property, static::$aliases)) {
+		if (in_array($property, static::$accessors)) {
 			return $this->$property;
 		}
 
@@ -92,7 +92,7 @@ class Application
 			$class = $commands->get($route) ?: $commands->get(static::DEFAULT_HANDLE);
 
 			if (empty($class)) {
-				throw new Exception('No commands are registered (including default).');
+				throw new LogicException('No commands are registered (including default).');
 			}
 
 			$cmd = new $class($this, $this->arguments);
